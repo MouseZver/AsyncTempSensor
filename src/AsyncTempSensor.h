@@ -4,39 +4,42 @@
 #include <Arduino.h>
 #include <OneWire.h>
 
-// Тип callback-функции
-typedef void (*TempCallback)(int index, float temp);
-
-// Тип для хранения 64-битного адреса датчика (8 байт)
+// Тип для хранения 64-битного адреса датчика
 typedef uint8_t DeviceAddress[8];
+
+// Тип функции обратного вызова
+typedef void (*TempCallback)(int index, float temp);
 
 class AsyncTempSensor {
 public:
     static const int MAX_DEVICES = 8;
 
+    // Конструктор: указываем пин и callback
     AsyncTempSensor(uint8_t pin, TempCallback callback = nullptr);
+
+    // Инициализация: поиск датчиков
     void begin();
+
+    // Обновление температуры (неблокирующий вызов)
     void update(unsigned long interval);
 
-    // Включить/выключить отладочный вывод
+    // Включить/выключить вывод отладочной информации
     void setDebugOutput(bool enabled);
-
-    int getDeviceCount() { return _deviceCount; }
 
 private:
     OneWire _oneWire;
     uint8_t _pin;
     TempCallback _callback = nullptr;
 
-    DeviceAddress _addresses[MAX_DEVICES];
-    int _deviceCount = 0;
-    float _temperatures[MAX_DEVICES];
+    DeviceAddress _addresses[MAX_DEVICES]; // Адреса найденных датчиков
+    int _deviceCount = 0;                  // Количество найденных датчиков
 
-    unsigned long _lastConversionTime = 0;
-    bool _conversionStarted = false;
+    unsigned long _lastConversionTime = 0; // Время последнего запуска измерения
+    bool _conversionStarted = false;       // Флаг: идёт ли измерение
+    bool _debug = false;                   // Флаг: включён ли дебаг
 
-    void findDevices();
-    void startConversion();
+    void findDevices();   // Поиск датчиков на шине
+    void startConversion(); // Запуск измерения температуры
 };
 
 #endif
