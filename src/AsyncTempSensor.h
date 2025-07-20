@@ -18,6 +18,9 @@ public:
     void begin();
     void update(unsigned long interval);
 
+    // Включить/выключить отладочный вывод
+    void setDebugOutput(bool enabled);
+
     int getDeviceCount() { return _deviceCount; }
 
 private:
